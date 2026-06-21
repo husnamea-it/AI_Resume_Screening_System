@@ -6,13 +6,20 @@ This application analyzes resumes, extracts skills, and predicts the suitable jo
 
 ---
 
+## 🚀 Live Application
+
+Try the deployed application here:
+
+https://airesumescreeningsystem-yedss29py8sdsttobgu52x.streamlit.app
+---
+
 # 🚀 Live Demo
+
 
 Streamlit Application:
 
 https://airesumescreeningsystem-yedss29py8sdsttobgu52x.streamlit.app
 
----
 
 # Features
 
@@ -25,14 +32,27 @@ https://airesumescreeningsystem-yedss29py8sdsttobgu52x.streamlit.app
 ✅ Interactive Streamlit interface  
 ✅ Fast prediction using saved ML models  
 
----
 
 # Technologies Used
+
+- Upload Resume (PDF/TXT)
+- Resume text extraction
+- Resume category prediction
+- Skill extraction
+- TF-IDF based text processing
+- Machine Learning classification
+- Interactive Streamlit interface
+- Fast prediction using saved ML models
+
+---
+
+## Technologies Used
 
 - Python
 - Streamlit
 - Scikit-learn
 - NLP
+- Natural Language Processing (NLP)
 - TF-IDF Vectorization
 - Pandas
 - NumPy
@@ -61,7 +81,6 @@ AI_Resume_Screening_System
 ```
 
 ---
-
 # How It Works
 
 ## 1. Data Collection
@@ -83,6 +102,28 @@ Machine Learning model learns from resume data.
 ## 5. Prediction
 
 User uploads resume → model predicts job category.
+## How It Works
+
+### 1. Data Collection
+
+Resume dataset is collected for training the model.
+
+### 2. Data Preprocessing
+
+Resume text is cleaned and prepared.
+
+### 3. Feature Extraction
+
+TF-IDF converts resume text into numerical features.
+
+### 4. Model Training
+
+Machine Learning model learns patterns from resume data.
+
+### 5. Prediction
+
+User uploads a resume and the system predicts the suitable category.
+>>>>>>> f3d3669 (Update README with app link)
 
 ---
 
@@ -101,6 +142,7 @@ cd AI_Resume_Screening_System
 ```
 
 Install libraries:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -111,6 +153,9 @@ pip install -r requirements.txt
 # Run Locally
 
 Start the application:
+## Run Locally
+
+Start Streamlit application:
 
 ```bash
 streamlit run app.py
@@ -122,8 +167,9 @@ The application opens in your browser.
 
 # Model Files
 
-This project uses trained files:
 
+
+This project uses trained ML files:
 - resume_classifier.pkl
 - tfidf_vectorizer.pkl
 - label_encoder.pkl
@@ -136,6 +182,14 @@ These files are loaded for prediction.
 
 The project is deployed using:
 
+These files are loaded to perform predictions.
+
+---
+
+## Deployment
+
+The application is deployed using:
+
 - GitHub
 - Streamlit Cloud
 
@@ -145,10 +199,13 @@ The project is deployed using:
 
 - Resume ranking system
 - Job description matching
+
 - AI-based recommendations
 - More resume categories
 - Better skill extraction
-
+- AI-based career recommendations
+- Better skill extraction
+- More resume categories
 ---
 
 # Author
