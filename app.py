@@ -2,271 +2,217 @@ import streamlit as st
 import joblib
 import PyPDF2
 import re
-from sklearn.metrics.pairwise import cosine_similarity
 
 
-st.set_page_config(
-    page_title="AI Resume Analyzer",
-    page_icon="📄",
-    layout="wide"
-)
-
+# -------------------------------
+# Load saved ML files
+# -------------------------------
 
 model = joblib.load("resume_classifier.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 encoder = joblib.load("label_encoder.pkl")
 
 
-# ---------- CSS ----------
+# -------------------------------
+# Page Setup
+# -------------------------------
 
-st.markdown("""
-<style>
+st.set_page_config(
+    page_title="AI Resume Screening System",
+    page_icon="📄"
+)
 
-.stApp{
-background:#f4f7fb;
-}
+st.title("📄 AI Resume Screening System")
 
-
-.header{
-background:linear-gradient(90deg,#0f172a,#2563eb);
-padding:35px;
-border-radius:18px;
-color:white;
-text-align:center;
-margin-bottom:30px;
-}
+st.write(
+    "Upload multiple resumes and get predicted job categories."
+)
 
 
-.header h1{
-font-size:42px;
-margin:0;
-}
+# -------------------------------
+# Resume Text Extraction
+# -------------------------------
+
+def extract_text(file):
+
+    text = ""
+
+    if file.name.endswith(".pdf"):
+
+        pdf_reader = PyPDF2.PdfReader(file)
+
+        for page in pdf_reader.pages:
+            text += page.extract_text()
+
+    elif file.name.endswith(".txt"):
+
+        text = file.read().decode("utf-8")
 
 
-.card{
-background:white;
-padding:25px;
-border-radius:18px;
-box-shadow:0 8px 25px rgba(0,0,0,0.08);
-height:100%;
-}
-
-
-.card h2{
-color:#1e3a8a;
-}
-
-
-.result{
-background:#ecfdf5;
-border-left:6px solid #10b981;
-padding:25px;
-border-radius:15px;
-font-size:22px;
-}
-
-
-.metric{
-background:white;
-padding:20px;
-border-radius:15px;
-text-align:center;
-box-shadow:0 5px 15px #ddd;
-}
-
-
-</style>
-""",unsafe_allow_html=True)
+    return text
 
 
 
-# Header
+# -------------------------------
+# Text Cleaning
+# -------------------------------
 
-st.markdown("""
-<div class="header">
+def clean_text(text):
 
-<h1>📄 AI Resume Screening System</h1>
+    text = text.lower()
 
-<p>
-Smart Resume Analysis • Skill Extraction • Job Matching
-</p>
+    text = re.sub(
+        r"[^a-zA-Z ]",
+        " ",
+        text
+    )
 
-</div>
-""",unsafe_allow_html=True)
+    text = re.sub(
+        r"\s+",
+        " ",
+        text
+    )
+
+    return text
 
 
 
-# Sidebar
+# -------------------------------
+# Skills Extraction
+# -------------------------------
 
-with st.sidebar:
+skills_list = [
+    "python",
+    "machine learning",
+    "deep learning",
+    "data science",
+    "sql",
+    "pandas",
+    "numpy",
+    "tensorflow",
+    "scikit-learn",
+    "streamlit",
+    "nlp",
+    "flask",
+    "git",
+    "github",
+    "html",
+    "css",
+    "javascript"
+]
 
-    st.title("⚙️ About")
 
-    st.info(
-    """
-    This AI system analyzes resumes
-    and compares them with job
-    descriptions using Machine Learning.
-    """
+def extract_skills(text):
+
+    found = []
+
+    text = text.lower()
+
+    for skill in skills_list:
+
+        if skill in text:
+            found.append(skill)
+
+    return found
+
+
+
+# -------------------------------
+# Upload Multiple Resumes
+# -------------------------------
+
+uploaded_files = st.file_uploader(
+    "Upload Resumes",
+    type=["pdf", "txt"],
+    accept_multiple_files=True
+)
+
+
+
+# -------------------------------
+# Prediction
+# -------------------------------
+
+if uploaded_files:
+
+    st.success(
+        f"{len(uploaded_files)} resume(s) uploaded"
     )
 
 
-    st.write("### Features")
+    for file in uploaded_files:
 
-    st.write("✔ Resume Classification")
-    st.write("✔ Skill Detection")
-    st.write("✔ Job Match Score")
-    st.write("✔ PDF Support")
+        st.divider()
 
-
-
-
-# Main
-
-col1,col2 = st.columns(2)
-
-
-with col1:
-
-    st.markdown(
-    '<div class="card">',
-    unsafe_allow_html=True
-    )
-
-    st.markdown("## 📤 Upload Resume")
-
-    file = st.file_uploader(
-        "Choose PDF or TXT",
-        type=["pdf","txt"]
-    )
-
-    st.markdown("</div>",
-    unsafe_allow_html=True)
-
-
-
-
-with col2:
-
-    st.markdown(
-    '<div class="card">',
-    unsafe_allow_html=True
-    )
-
-    st.markdown("## 💼 Job Description")
-
-    job = st.text_area(
-        "Paste job requirements",
-        height=200,
-        placeholder="Example: Python developer with ML experience..."
-    )
-
-    st.markdown("</div>",
-    unsafe_allow_html=True)
-
-
-
-
-def read_file(file):
-
-    if file.type=="application/pdf":
-
-        pdf=PyPDF2.PdfReader(file)
-
-        text=""
-
-        for p in pdf.pages:
-            text+=p.extract_text()
-
-        return text
-
-    return file.read().decode()
-
-
-
-if file and job:
-
-
-    resume=read_file(file)
-
-
-    cleaned=re.sub(
-        "[^a-zA-Z ]",
-        "",
-        resume
-    )
-
-
-    vector=vectorizer.transform(
-        [cleaned]
-    )
-
-
-    prediction=model.predict(vector)
-
-    category=encoder.inverse_transform(
-        prediction
-    )[0]
-
-
-    score=cosine_similarity(
-        vectorizer.transform([resume]),
-        vectorizer.transform([job])
-    )[0][0]*100
-
-
-
-    st.markdown("---")
-
-
-    st.markdown("## 📊 Analysis Result")
-
-
-    a,b,c=st.columns(3)
-
-
-    with a:
-        st.markdown(
-        f"""
-        <div class="metric">
-
-        🎯 Category<br>
-        <b>{category}</b>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+        st.subheader(
+            file.name
         )
 
 
-    with b:
-        st.markdown(
-        f"""
-        <div class="metric">
+        resume_text = extract_text(file)
 
-        📈 Match<br>
-        <b>{score:.2f}%</b>
 
-        </div>
-        """,
-        unsafe_allow_html=True
+        cleaned = clean_text(resume_text)
+
+
+        if cleaned.strip() == "":
+            st.warning(
+                "Could not extract text"
+            )
+            continue
+
+
+
+        # Vectorize
+
+        features = vectorizer.transform(
+            [cleaned]
         )
 
 
-    with c:
+        # Predict
 
-        st.markdown(
-        """
-        <div class="metric">
-
-        🤖 AI<br>
-        <b>Active</b>
-
-        </div>
-        """,
-        unsafe_allow_html=True
+        prediction = model.predict(
+            features
         )
 
 
+        category = encoder.inverse_transform(
+            prediction
+        )[0]
 
-    st.success("Resume analysis completed successfully 🚀")
+
+
+        # Skills
+
+        skills = extract_skills(
+            cleaned
+        )
+
+
+        st.write(
+            "### Predicted Category:"
+        )
+
+        st.success(
+            category
+        )
+
+
+        st.write(
+            "### Skills Found:"
+        )
+
+
+        if skills:
+
+            st.write(
+                ", ".join(skills)
+            )
+
+        else:
+
+            st.write(
+                "No skills detected"
+            )
+            
