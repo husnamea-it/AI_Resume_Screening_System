@@ -1,41 +1,38 @@
-
 # AI Resume Screening System
 
 An AI-powered Resume Screening System built using **Python, Machine Learning, NLP, and Streamlit**.
 
-This project automatically analyzes resumes, extracts skills, and predicts the suitable job category using a trained machine learning model.
+This application analyzes resumes, extracts skills, and predicts the suitable job category using a trained Machine Learning model.
 
 ---
 
-## Features
+# 🚀 Live Demo
 
-- Upload Resume (PDF/TXT)
-- Resume text extraction
-- Skill extraction
-- Resume category prediction
-- TF-IDF based text processing
-- Machine Learning classification
-- Interactive Streamlit web application
-- Fast prediction using saved ML models
+Streamlit Application:
+
+https://airesumescreeningsystem-yedss29py8sdsttobgu52x.streamlit.app
 
 ---
 
-## Demo
+# Features
 
-The application allows users to upload a resume and get:
-
-- Predicted job category
-- Extracted skills
-- Resume analysis result
+✅ Upload Resume (PDF/TXT)  
+✅ Resume text extraction  
+✅ Skill extraction  
+✅ Resume category prediction  
+✅ TF-IDF based text processing  
+✅ Machine Learning classification  
+✅ Interactive Streamlit interface  
+✅ Fast prediction using saved ML models  
 
 ---
 
-## Technologies Used
+# Technologies Used
 
 - Python
 - Streamlit
 - Scikit-learn
-- NLP (Natural Language Processing)
+- NLP
 - TF-IDF Vectorization
 - Pandas
 - NumPy
@@ -43,69 +40,67 @@ The application allows users to upload a resume and get:
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```
 AI_Resume_Screening_System
 │
 ├── app.py
-│
 ├── train.py
-│
 ├── model_training.py
-│
 ├── preprocessing.py
 │
 ├── dataset/
 │
 ├── resume_classifier.pkl
-│
 ├── tfidf_vectorizer.pkl
-│
 ├── label_encoder.pkl
 │
 ├── requirements.txt
-│
 └── README.md
 ```
 
 ---
 
-## Machine Learning Workflow
+# How It Works
 
-1. Collect resume dataset
+## 1. Data Collection
 
-2. Data preprocessing
+Resume dataset is collected and prepared.
 
-3. Clean resume text
+## 2. Data Preprocessing
 
-4. Convert text into numerical features using TF-IDF
+Resume text is cleaned and prepared for training.
 
-5. Train machine learning model
+## 3. Text Vectorization
 
-6. Save trained model using Joblib
+TF-IDF converts resume text into numerical features.
 
-7. Load model in Streamlit application
+## 4. Model Training
 
-8. Predict resume category
+Machine Learning model learns from resume data.
+
+## 5. Prediction
+
+User uploads resume → model predicts job category.
 
 ---
 
-## Installation
+# Installation
 
-### Clone Repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/husnamea-it/AI_Resume_Screening_System.git
 ```
 
-### Open Project Folder
+Move into project folder:
 
 ```bash
 cd AI_Resume_Screening_System
 ```
 
-### Install Required Libraries
+Install libraries:
 
 ```bash
 pip install -r requirements.txt
@@ -113,58 +108,55 @@ pip install -r requirements.txt
 
 ---
 
-## Run Application
+# Run Locally
 
-Start the Streamlit app:
+Start the application:
 
 ```bash
 streamlit run app.py
 ```
 
-The application will open in your browser.
+The application opens in your browser.
 
 ---
 
-## Model Files
+# Model Files
 
-The project uses saved machine learning files:
+This project uses trained files:
 
-- `resume_classifier.pkl`
-- `tfidf_vectorizer.pkl`
-- `label_encoder.pkl`
+- resume_classifier.pkl
+- tfidf_vectorizer.pkl
+- label_encoder.pkl
 
-These files are loaded to perform resume prediction.
-
----
-
-## Screenshots
-
-Add your application screenshots here.
-
-Example:
-
-```
-![App Screenshot](screenshot.png)
-```
+These files are loaded for prediction.
 
 ---
 
-## Future Improvements
+# Deployment
 
-- Add AI-based resume ranking
-- Add job description matching
-- Improve skill extraction
-- Add more resume categories
-- Deploy as a web application
+The project is deployed using:
 
----
-
-## Author
-
-**Husna**
+- GitHub
+- Streamlit Cloud
 
 ---
 
-## License
+# Future Improvements
+
+- Resume ranking system
+- Job description matching
+- AI-based recommendations
+- More resume categories
+- Better skill extraction
+
+---
+
+# Author
+
+Husna
+
+---
+
+# License
 
 This project is created for educational and portfolio purposes.
