@@ -4,18 +4,18 @@ import PyPDF2
 import re
 
 
-# -------------------------------
-# Load saved ML files
-# -------------------------------
+# -----------------------------
+# Load Models
+# -----------------------------
 
 model = joblib.load("resume_classifier.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 encoder = joblib.load("label_encoder.pkl")
 
 
-# -------------------------------
+# -----------------------------
 # Page Setup
-# -------------------------------
+# -----------------------------
 
 st.set_page_config(
     page_title="AI Resume Screening System",
@@ -25,13 +25,13 @@ st.set_page_config(
 st.title("📄 AI Resume Screening System")
 
 st.write(
-    "Upload multiple resumes and get predicted job categories."
+    "Upload resume(s), add job description and check match score."
 )
 
 
-# -------------------------------
-# Resume Text Extraction
-# -------------------------------
+# -----------------------------
+# Functions
+# -----------------------------
 
 def extract_text(file):
 
@@ -39,23 +39,18 @@ def extract_text(file):
 
     if file.name.endswith(".pdf"):
 
-        pdf_reader = PyPDF2.PdfReader(file)
+        reader = PyPDF2.PdfReader(file)
 
-        for page in pdf_reader.pages:
+        for page in reader.pages:
             text += page.extract_text()
 
     elif file.name.endswith(".txt"):
 
         text = file.read().decode("utf-8")
 
-
     return text
 
 
-
-# -------------------------------
-# Text Cleaning
-# -------------------------------
 
 def clean_text(text):
 
@@ -77,38 +72,33 @@ def clean_text(text):
 
 
 
-# -------------------------------
-# Skills Extraction
-# -------------------------------
-
-skills_list = [
-    "python",
-    "machine learning",
-    "deep learning",
-    "data science",
-    "sql",
-    "pandas",
-    "numpy",
-    "tensorflow",
-    "scikit-learn",
-    "streamlit",
-    "nlp",
-    "flask",
-    "git",
-    "github",
-    "html",
-    "css",
-    "javascript"
-]
-
-
 def extract_skills(text):
+
+    skills = [
+        "python",
+        "machine learning",
+        "deep learning",
+        "data science",
+        "sql",
+        "pandas",
+        "numpy",
+        "tensorflow",
+        "scikit-learn",
+        "streamlit",
+        "nlp",
+        "flask",
+        "git",
+        "github",
+        "html",
+        "css",
+        "javascript"
+    ]
 
     found = []
 
     text = text.lower()
 
-    for skill in skills_list:
+    for skill in skills:
 
         if skill in text:
             found.append(skill)
@@ -117,30 +107,69 @@ def extract_skills(text):
 
 
 
-# -------------------------------
-# Upload Multiple Resumes
-# -------------------------------
+def match_score(resume, job):
+
+    resume_words = set(
+        clean_text(resume).split()
+    )
+
+    job_words = set(
+        clean_text(job).split()
+    )
+
+
+    if len(job_words) == 0:
+        return 0
+
+
+    matched = resume_words.intersection(
+        job_words
+    )
+
+
+    score = (
+        len(matched)
+        /
+        len(job_words)
+    ) * 100
+
+
+    return round(score,2)
+
+
+
+# -----------------------------
+# Job Description
+# -----------------------------
+
+job_description = st.text_area(
+    "📌 Paste Job Description",
+    height=200
+)
+
+
+
+# -----------------------------
+# Upload Resume
+# -----------------------------
 
 uploaded_files = st.file_uploader(
-    "Upload Resumes",
-    type=["pdf", "txt"],
+    "📄 Upload Resume(s)",
+    type=["pdf","txt"],
     accept_multiple_files=True
 )
 
 
 
-# -------------------------------
-# Prediction
-# -------------------------------
+# -----------------------------
+# Processing
+# -----------------------------
 
 if uploaded_files:
 
-    st.success(
-        f"{len(uploaded_files)} resume(s) uploaded"
-    )
-
 
     for file in uploaded_files:
+
 
         st.divider()
 
@@ -152,25 +181,27 @@ if uploaded_files:
         resume_text = extract_text(file)
 
 
-        cleaned = clean_text(resume_text)
+        cleaned = clean_text(
+            resume_text
+        )
 
 
-        if cleaned.strip() == "":
-            st.warning(
-                "Could not extract text"
+        if cleaned == "":
+
+            st.error(
+                "Could not read resume"
             )
+
             continue
 
 
 
-        # Vectorize
+        # Prediction
 
         features = vectorizer.transform(
             [cleaned]
         )
 
-
-        # Predict
 
         prediction = model.predict(
             features
@@ -183,6 +214,16 @@ if uploaded_files:
 
 
 
+        st.write(
+            "### 🎯 Predicted Category"
+        )
+
+        st.success(
+            category
+        )
+
+
+
         # Skills
 
         skills = extract_skills(
@@ -191,28 +232,47 @@ if uploaded_files:
 
 
         st.write(
-            "### Predicted Category:"
-        )
-
-        st.success(
-            category
-        )
-
-
-        st.write(
-            "### Skills Found:"
+            "### 🛠 Skills Found"
         )
 
 
         if skills:
 
-            st.write(
+            st.info(
                 ", ".join(skills)
             )
 
         else:
 
-            st.write(
-                "No skills detected"
+            st.warning(
+                "No skills found"
             )
-            
+
+
+
+        # Match Score
+
+        if job_description:
+
+
+            score = match_score(
+                cleaned,
+                job_description
+            )
+
+
+            st.write(
+                "### 📊 Resume Match Score"
+            )
+
+
+            st.success(
+                f"{score}%"
+            )
+
+
+        else:
+
+            st.warning(
+                "Add job description to calculate match score"
+            )
