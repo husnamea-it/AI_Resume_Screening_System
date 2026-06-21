@@ -1,23 +1,31 @@
 # AI Resume Screening System
 
+AI-powered Resume Screening System built using Python, Machine Learning and Streamlit.
+
 ## Features
-
-- Upload PDF Resume
-- Predict Resume Category
-- Extract Skills
-- Job Description Matching
+- Resume Category Prediction
+- Skill Extraction
 - Resume Match Score
+- PDF and TXT Resume Support
+- Interactive Web Interface
 
-## Technologies
-
+## Technologies Used
 - Python
+- Scikit-learn
 - Streamlit
-- Scikit-Learn
-- PyPDF2
+- TF-IDF Vectorization
 - Joblib
 
-## Run Project
+## Project Structure
+app.py
+preprocessing.py
+model_training.py
+resume_classifier.pkl
+tfidf_vectorizer.pkl
+label_encoder.pkl
 
-pip install -r requirements.txt
+## Live Demo
+[Streamlit App](https://ai-resume-screening-husna.streamlit.app/)
 
-streamlit run app.py
+## GitHub Repository
+https://github.com/husnamea-it/AI_Resume_Screening_System
