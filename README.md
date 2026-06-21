@@ -23,14 +23,16 @@ https://airesumescreeningsystem-yedss29py8sdsttobgu52x.streamlit.app
 
 # Features
 
-✅ Upload Resume (PDF/TXT)  
-✅ Resume text extraction  
-✅ Skill extraction  
-✅ Resume category prediction  
-✅ TF-IDF based text processing  
-✅ Machine Learning classification  
-✅ Interactive Streamlit interface  
-✅ Fast prediction using saved ML models  
+
+- Upload single or multiple resumes (PDF/TXT)
+- Resume text extraction
+- Resume category prediction
+- Skill extraction
+- Batch resume analysis
+- TF-IDF based text processing
+- Machine Learning classification
+- Interactive Streamlit web interface
+- Fast prediction using saved ML models
 
 
 # Technologies Used
