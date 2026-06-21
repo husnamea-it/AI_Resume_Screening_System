@@ -1,104 +1,272 @@
-from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
 import joblib
+import PyPDF2
 import re
-from PyPDF2 import PdfReader
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Load saved model
+
+st.set_page_config(
+    page_title="AI Resume Analyzer",
+    page_icon="📄",
+    layout="wide"
+)
+
+
 model = joblib.load("resume_classifier.pkl")
-tfidf = joblib.load("tfidf_vectorizer.pkl")
-label_encoder = joblib.load("label_encoder.pkl")
+vectorizer = joblib.load("tfidf_vectorizer.pkl")
+encoder = joblib.load("label_encoder.pkl")
 
-# Clean resume text
-def clean_resume(text):
-    text = text.lower()
-    text = re.sub(r'http\S+', '', text)
-    text = re.sub(r'[^a-zA-Z\s]', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
 
-# Website title
-st.title("🤖 AI Resume Screening System")
+# ---------- CSS ----------
 
-st.write("Upload a resume and predict its job category.")
+st.markdown("""
+<style>
 
-# Upload text file
-uploaded_file = st.file_uploader(
-    "Choose a Resume",
-    type=["pdf", "txt"]
-)
+.stApp{
+background:#f4f7fb;
+}
 
-if uploaded_file is not None:
-    if uploaded_file.name.endswith(".pdf"):
-        pdf = PdfReader(uploaded_file)
-        resume_text = ""
 
-        for page in pdf.pages:
-            text = page.extract_text()
-            if text:
-                resume_text += text
+.header{
+background:linear-gradient(90deg,#0f172a,#2563eb);
+padding:35px;
+border-radius:18px;
+color:white;
+text-align:center;
+margin-bottom:30px;
+}
 
-    else:
-        resume_text = uploaded_file.read().decode("utf-8")
 
-    st.subheader("Resume Preview")
-    st.write(resume_text[:500])  # Show first 500 characters
+.header h1{
+font-size:42px;
+margin:0;
+}
 
-    cleaned_resume = clean_resume(resume_text)
-    resume_vector = tfidf.transform([cleaned_resume])
 
-    prediction = model.predict(resume_vector)
-    category = label_encoder.inverse_transform(prediction)
+.card{
+background:white;
+padding:25px;
+border-radius:18px;
+box-shadow:0 8px 25px rgba(0,0,0,0.08);
+height:100%;
+}
 
-    st.success(f"Predicted Category: {category[0]}")
-    skills_list = [
-        "python",
-        "sql",
-        "machine learning",
-        "deep learning",
-        "pandas",
-        "numpy",
-        "java",
-        "html",
-        "css",
-        "javascript",
-        "react",
-        "django",
-        "flask",
-        "git"
-    ]
 
-    found_skills = []
+.card h2{
+color:#1e3a8a;
+}
 
-    for skill in skills_list:
-        if skill in cleaned_resume:
-            found_skills.append(skill)
 
-    st.subheader("Skills Found")
+.result{
+background:#ecfdf5;
+border-left:6px solid #10b981;
+padding:25px;
+border-radius:15px;
+font-size:22px;
+}
 
-    for skill in found_skills:
-        st.write("✔", skill.title())
-    st.subheader("Job Description Matching")
 
-job_description = st.text_area(
-    "Paste Job Description Here"
-)
+.metric{
+background:white;
+padding:20px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 5px 15px #ddd;
+}
 
-if job_description:
 
-    jd_clean = clean_resume(job_description)
+</style>
+""",unsafe_allow_html=True)
 
-    resume_vector = tfidf.transform([cleaned_resume])
 
-    jd_vector = tfidf.transform([jd_clean])
 
-    score = cosine_similarity(
-        resume_vector,
-        jd_vector
-    )[0][0]
+# Header
 
-    match_percent = round(score * 100, 2)
+st.markdown("""
+<div class="header">
 
-    st.success(
-        f"Resume Match Score: {match_percent}%"
+<h1>📄 AI Resume Screening System</h1>
+
+<p>
+Smart Resume Analysis • Skill Extraction • Job Matching
+</p>
+
+</div>
+""",unsafe_allow_html=True)
+
+
+
+# Sidebar
+
+with st.sidebar:
+
+    st.title("⚙️ About")
+
+    st.info(
+    """
+    This AI system analyzes resumes
+    and compares them with job
+    descriptions using Machine Learning.
+    """
     )
+
+
+    st.write("### Features")
+
+    st.write("✔ Resume Classification")
+    st.write("✔ Skill Detection")
+    st.write("✔ Job Match Score")
+    st.write("✔ PDF Support")
+
+
+
+
+# Main
+
+col1,col2 = st.columns(2)
+
+
+with col1:
+
+    st.markdown(
+    '<div class="card">',
+    unsafe_allow_html=True
+    )
+
+    st.markdown("## 📤 Upload Resume")
+
+    file = st.file_uploader(
+        "Choose PDF or TXT",
+        type=["pdf","txt"]
+    )
+
+    st.markdown("</div>",
+    unsafe_allow_html=True)
+
+
+
+
+with col2:
+
+    st.markdown(
+    '<div class="card">',
+    unsafe_allow_html=True
+    )
+
+    st.markdown("## 💼 Job Description")
+
+    job = st.text_area(
+        "Paste job requirements",
+        height=200,
+        placeholder="Example: Python developer with ML experience..."
+    )
+
+    st.markdown("</div>",
+    unsafe_allow_html=True)
+
+
+
+
+def read_file(file):
+
+    if file.type=="application/pdf":
+
+        pdf=PyPDF2.PdfReader(file)
+
+        text=""
+
+        for p in pdf.pages:
+            text+=p.extract_text()
+
+        return text
+
+    return file.read().decode()
+
+
+
+if file and job:
+
+
+    resume=read_file(file)
+
+
+    cleaned=re.sub(
+        "[^a-zA-Z ]",
+        "",
+        resume
+    )
+
+
+    vector=vectorizer.transform(
+        [cleaned]
+    )
+
+
+    prediction=model.predict(vector)
+
+    category=encoder.inverse_transform(
+        prediction
+    )[0]
+
+
+    score=cosine_similarity(
+        vectorizer.transform([resume]),
+        vectorizer.transform([job])
+    )[0][0]*100
+
+
+
+    st.markdown("---")
+
+
+    st.markdown("## 📊 Analysis Result")
+
+
+    a,b,c=st.columns(3)
+
+
+    with a:
+        st.markdown(
+        f"""
+        <div class="metric">
+
+        🎯 Category<br>
+        <b>{category}</b>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+        )
+
+
+    with b:
+        st.markdown(
+        f"""
+        <div class="metric">
+
+        📈 Match<br>
+        <b>{score:.2f}%</b>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+        )
+
+
+    with c:
+
+        st.markdown(
+        """
+        <div class="metric">
+
+        🤖 AI<br>
+        <b>Active</b>
+
+        </div>
+        """,
+        unsafe_allow_html=True
+        )
+
+
+
+    st.success("Resume analysis completed successfully 🚀")
